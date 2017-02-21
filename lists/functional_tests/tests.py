@@ -10,7 +10,7 @@ MAX_WAIT = 10
 class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self):
-        self.browser = webdriver.Chrome()
+        self.browser = webdriver.Chrome('/data/work/231/chromedriver')
 
     def tearDown(self):
         self.browser.quit()
@@ -28,7 +28,7 @@ class NewVisitorTest(LiveServerTestCase):
                     raise e
                 time.sleep(0.5)
 
-    def test_can_start_a_list_and_retrieve_it_later(self):
+    def test_can_start_a_list_for_one_user(self):
         #Go to the page
         self.browser.get(self.live_server_url)
 
@@ -64,5 +64,50 @@ class NewVisitorTest(LiveServerTestCase):
         self.wait_for_row_in_list_table('1: Build home')
         self.wait_for_row_in_list_table('2: Plant tree')
 
+        # end
 
-        self.fail('Finish the test!')
+
+    def test_multiple_users_can_start_lists_at_different_urls(self):
+
+        # First user create todo list
+        self.browser.get(self.live_server_url)
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy ticket')
+        inputbox.send_keys(Keys.ENTER)
+
+        # Page updates  again, and shows two items
+        self.wait_for_row_in_list_table('1: Buy ticket')
+
+        first_user_list_url = self.browser.current_url
+        self.assertRegex(first_user_list_url, '/lists/.+')
+
+        # New user want to create list
+
+        # First user gone
+        self.browser.quit()
+        self.browser = webdriver.Chrome('/data/work/231/chromedriver')
+
+        # Second user come
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn("Buy honey", page_text)
+        self.assertNotIn("make a trip", page_text)
+
+        # He create new item
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: Buy honey')
+
+        # Check his own url
+        second_user_url = self.browser.current_url
+        self.assertRegex(second_user_url, '/lists/.+')
+        self.assertNotEqual(second_user_url, first_user_list_url)
+
+        self.assertNotIn("Buy ticket", page_text)
+        self.assertIn("Buy honey", page_text)
+
+        # Second user go away
+
+
+
+
