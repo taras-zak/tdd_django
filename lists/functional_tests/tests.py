@@ -3,6 +3,7 @@ import time
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import WebDriverException
 
 MAX_WAIT = 10
 
@@ -95,6 +96,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         # He create new item
         inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy honey')
         inputbox.send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('1: Buy honey')
 
@@ -103,6 +105,7 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertRegex(second_user_url, '/lists/.+')
         self.assertNotEqual(second_user_url, first_user_list_url)
 
+        page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn("Buy ticket", page_text)
         self.assertIn("Buy honey", page_text)
 
