@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn server for lists_app
+
+[Service]
+Restart=on-failure  
+User=ubuntu-get
+WorkingDirectory=/home/ubuntu-get/live.lists_app/source/lists
+ExecStart=/home/ubuntu-get/live.lists_app/venv/bin/gunicorn \
+    --bind unix:/tmp/lists_app.socket \
+    lists.wsgi:application       
+
+[Install]
+WantedBy=multi-user.target
+

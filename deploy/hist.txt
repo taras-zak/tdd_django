@@ -1,0 +1,48 @@
+
+    3  sudo apt-get install nginx
+    8  sudo apt-get install git python3 python3-venv
+    9  sudo apt-get install postgresql
+   10  sudo -u postgres psql
+   12  mkdir live.lists_app
+   13  cd live.lists_app/
+   14  mkdir static 
+   15  python3 -m venv venv
+   18  git clone https://github.com/taras-zak/tdd_django.git source
+   35  sudo apt install python-pip3
+   36  source venv/bin/activate
+   37  pip install -r  source/requirements.txt 
+   39  cd source/
+   42  cd lists/
+   43  python manage.py runserver
+   44  vim  /etc/nginx/sites-available/lists
+   45  sudo vim  /etc/nginx/sites-available/lists
+   46  sudo ln -s /etc/nginx/sites-enabled/lists
+   47  ll /etc/nginx/sites-enabled/
+   48  sudo ln -s /etc/nginx/sites-available/lists /etc/nginx/sites-enabled/lists
+   49  ll /etc/nginx/sites-enabled/
+   50  sudo rm /etc/nginx/sites-enabled/default
+   51  sudo systemctl reload nginx
+   52  python manage.py runserver
+   53  python manage.py migrate
+   54  python manage.py runserver
+   55  pip install gunicorn
+   56  gunicorn lists.wsgi:application
+   57  python manage.py collectstatic
+   65  vim /etc/nginx/sites-available/lists 
+   66  sudo vim /etc/nginx/sites-available/lists 
+   67  sudo systemctl reload nginx
+
+   87  gunicorn lists.wsgi:application --bind unis:/tmp/lists_app.socket
+   88  gunicorn --bind unis:/tmp/lists_app.socket lists.wsgi:application
+   89  gunicorn --bind unix:/tmp/lists_app.socket lists.wsgi:application
+   90  vim lists/settings.py 
+   91  gunicorn --bind unix:/tmp/lists_app.socket lists.wsgi:application
+   92  vim lists/settings.py 
+   93  gunicorn --bind unix:/tmp/lists_app.socket lists.wsgi:application
+   95  sudo vim /etc/systemd/system/lists_app.service
+
+
+  115  mkdir deploy_tools
+
+  119  sudo cp /etc/systemd/system/lists_app.service deploy_tools/lists_app.template.service
+
